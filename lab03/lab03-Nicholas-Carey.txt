@@ -1,0 +1,33 @@
+mkdir stat133-lab03
+cd stat133-lab03
+curl -O http://textfiles.com/food/bread.txt
+curl -O http://textfiles.com/food/btaco.txt
+curl -O http://textfiles.com/food/1st_aid.txt
+curl -O http://textfiles.com/food/beesherb.txt
+curl -O http://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv
+curl -O http://www.math.uah.edu/stat/data/Fisher.csv
+curl -O http://web.pdx.edu/~gerbing/data/cars.csv
+ls -l
+man ls
+q
+ls -l -t
+mkdir data
+cd data
+mkdir txt-files
+mkdir csv-files
+mv ../bread.txt txt-files
+mv ../*.txt txt-files
+mv ../*.csv csv-files
+cd ..
+mkdir copies
+cp data/txt-files/bread.txt copies
+cp data/txt-files/*.txt copies
+cp data/csv-files/*.csv copies
+cd copies
+mv bread.txt bread-recipe.txt
+mv Fisher.csv iris.csv
+mv btaco.txt breakfast-taco.txt
+cd ..
+mv copies copy-files
+rm -r copy-files
+ls data/txt-files | sort -r

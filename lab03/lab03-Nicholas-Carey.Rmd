@@ -1,0 +1,47 @@
+---
+title: "Lab03"
+author: "Nicholas Carey"
+date: "2/5/2018"
+output: html_document
+---
+```{r}
+setwd("~")
+getwd()
+dir.create("stat133-lab03")
+setwd("stat133-lab03")
+download.file("http://textfiles.com/food/bread.txt", destfile = "bread.txt")
+download.file("http://textfiles.com/food/btaco.txt", destfile = "btaco.txt")
+download.file("http://textfiles.com/food/1st_aid.txt", destfile = "1st_aid.txt")
+download.file("http://textfiles.com/food/beesherb.txt", destfile = "beesherb.txt")
+download.file("http://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv", destfile = "forestfires.csv")
+download.file("http://www.math.uah.edu/stat/data/Fisher.csv", destfile = "Fisher.csv")
+download.file("http://web.pdx.edu/~gerbing/data/cars.csv", destfile = "cars.csv")
+list.files()
+dir.create("data")
+setwd("data")
+dir.create("txt-files")
+dir.create("csv-files")
+file.copy("../bread.txt", to = "txt-files")
+file.remove("../bread.txt")
+file.copy(list.files(path = "../", pattern = ".txt", full.names = TRUE), to = "./txt-files")
+file.remove(list.files(path = "../", pattern = ".txt", full.names = TRUE))
+file.copy(list.files(path = "../", pattern = ".csv", full.names = TRUE), to = "./csv-files")
+file.remove(list.files(path = "../", pattern = ".csv", full.names = TRUE))
+setwd("..")
+dir.create("copies")
+file.copy("data/txt-files/bread.txt", to = "./copies")
+file.copy(list.files(path = "./data/txt-files", pattern = ".txt", full.names = TRUE), to = "./copies")
+file.copy(list.files(path = "./data/csv-files", pattern = "csv", full.names = TRUE), to = "./copies")
+setwd("copies")
+file.rename("bread.txt", to = "bread-recipe.txt")
+file.rename("Fisher.csv", to = "iris.csv")
+file.rename("btaco.txt", to = "breakfast-taco.txt")
+setwd("..")
+file.rename("copies", to = "copy-files")
+unlink("copy-files", recursive = TRUE)
+sort(list.files(path = "./data/txt-files"), decreasing = TRUE)
+
+#reset everything so none of this every happened
+setwd("~")
+unlink("stat133-lab03", recursive = TRUE)
+```
