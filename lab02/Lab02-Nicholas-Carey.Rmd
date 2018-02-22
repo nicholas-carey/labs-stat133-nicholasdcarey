@@ -1,0 +1,141 @@
+---
+title: "Lab02"
+author: "Nicholas Carey"
+date: "02/01/2018"
+output: html_document
+---
+###Loading the File
+```{r}
+load('nba2017-salary-points.RData')
+scored <- points1 + points2 + points3 #scored is not a variable that actually exists in this file so I assumed it was the total number of baskets scored and made it myself
+ls()
+```
+###Inspecting the data objects
+```{r}
+length(player)
+length(team)
+length(position)
+length(salary)
+length(scored)
+```
+All the vectors are the same length
+```{r}
+anyNA(c(player, team, position, salary, scored, points))
+is.vector(player)
+is.vector(team)
+is.vector(position)
+is.vector(salary)
+is.vector(scored)
+is.vector(points)
+head(player)
+head(team)
+head(position)
+head(salary)
+head(scored)
+head(points)
+tail(player)
+tail(team)
+tail(position)
+tail(salary)
+tail(scored)
+tail(points)
+summary(player)
+summary(team)
+summary(position)
+summary(salary)
+summary(scored)
+summary(points)
+```
+None of the vectors contain missing values.   
+Player and position vectors are **character vectors.**   
+Team is a **factor.**    
+Salary, points and scored are **numeric vectors** with salary containing *doubles* and scored and points containing *integers*
+We know the above information because of the types of elements in each vector and the output from the functions we used.
+
+******
+
+##Subsetting Vectors
+```{r}
+four <- head(player, n = 4)
+four[1]
+four[0]
+four[-1]
+four[-c(1, 2, 3)]
+four[5]
+four[c(1, 2, 2, 3, 3, 3)]
+player[seq(from = 2, to = length(player), by = 2)]
+salary[seq(from = 1, to = length(salary), by = 2)]
+team[seq(from = 5, to = length(team), by = 5)]
+scored[seq(from = 10, to = length(scored), by = 10)]
+rev(team[seq(from = 2, to = length(team), by = 2)])
+player[team == "GSW" & position == "C"]
+player[team == "GSW" | team == "LAL"]
+player[position == "PG" | position == "SG" & team == "LAL"]
+player[team == "GSW" | team == "LAL" & position == "SF"]
+player[which.max(salary)]
+player[which.min(salary)]
+player[which.max(scored)]
+salary[which.max(points)]
+max(salary[position == "C"])
+team[which.max(scored)]
+player[which.max(points3)]
+```
+###Subsetting with Character Vectors
+```{r}
+warriors_player <- player[team == "GSW"]
+warriors_salary <- salary[team == "GSW"]
+warriors_points <- scored[team == "GSW"]
+names(warriors_salary) <- warriors_player
+warriors_salary["Andre Iguodala"]
+warriors_salary[c("Stephen Curry", "Kevin Durant")]
+```
+
+******
+
+##Some plotting
+```{r}
+plot(scored, salary, main = "Points Scored vs Salary")
+log_scored <- log(scored)
+log_salary <- log(salary)
+plot(log_scored, log_salary, main = "Log-Transformed Points Scored vs Salary")
+text(log_scored, log_salary, labels = player)
+plot(log_scored, log_salary, main = "Log-Transformed Points Scored vs Salary")
+text(log_scored, log_salary, labels = abbreviate(player))
+plot(warriors_points, warriors_salary, main = "Warriors Scored Points vs Salary")
+text(warriors_points, warriors_salary, labels = warriors_player)
+log_warriors_points <- log(warriors_points)
+log_warriors_salary <- log(warriors_salary)
+plot(log_warriors_points, log_warriors_salary, main = "Log-Transformed Warriors Scored Points vs Salary")
+text(log_warriors_points, log_warriors_salary, labels = warriors_player)
+```
+
+******
+
+##Vectorization and Recycling
+```{r}
+salary_millions <- salary/1000000
+scored_points <- points1 + (2 * points2) + (3 * points3)
+sum(scored_points != points) == 0 #checks if scored_points and points are the same
+```
+
+******
+
+##Factors
+```{r}
+is.factor(team)
+position_fac <- factor(position)
+table(position_fac)
+position_fac[team == "GSW"]
+position_fac[salary_millions > 15]
+table(position_fac[salary_millions > 15])
+prop.table(table(team[position == "SG"]))
+```
+
+******
+
+##More Plots
+```{r}
+plot(scored, salary_millions, col = position_fac, main = "Score vs Salary", pch = 10, cex = 0.75, xlab = "Number of Baskets Made", ylab = "Salary in Millions")
+legend("bottomright", legend = unique(position_fac), pch = 10, col = unique(position_fac), title = "Postion")
+#I had to use the unique() function instead of levels() in the legend so that the legend correctly corresponded  to the plot. Also I used pch = 10 because that is symbol closest in appearance to a basketball
+```

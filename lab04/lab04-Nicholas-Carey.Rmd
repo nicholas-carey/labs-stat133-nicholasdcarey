@@ -1,0 +1,323 @@
+---
+title: "Lab04"
+author: "Nicholas Carey"
+date: "2/15/2018"
+output: html_document
+---
+## Abalone
+* What's the character delimiter?
+    + The character delimiter is ","  
+* Is there a row for column names?
+    + There is no row for column names.  
+* Are there any missing values? If so, how are they codified?
+    + There are no missing values
+* What is the data type of each column?
+    + Sex is a factor. Length, diameter, height, whole weight, shucked weight, and viscera rate are real numbers. Rings is an integer. 
+```{r}
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data"
+abalone <- read.table(url, sep = ",")
+```
+#### Getting a Local Copy of Data
+```{r}
+origin <- "http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data"
+destination <- "~/Desktop/Stat133/Lab4/abalone.data"
+download.file(origin, destination)
+abalone <- read.table(destination, sep = ",")
+head(abalone)
+tail(abalone)
+str(abalone, vec.len = 1)
+```
+#### Basic Importing
+```{r}
+# vector of column names
+col_names <- c(
+    'sex',
+    'length',
+    'diameter',
+    'height',
+    'whole_weight',
+    'shucked_weight',
+    'viscera_weight',
+    'shell_weight',
+    'rings'
+)
+
+# vector of data types (for each column)
+col_types <- c(
+    'factor',
+    'numeric',
+    'numeric',
+    'numeric',
+    'numeric',
+    'numeric',
+    'numeric',
+    'numeric',
+    'integer'   
+)
+abalone <- read.table("~/Desktop/Stat133/Lab4/abalone.data",
+                      col.names = col_names,
+                      colClasses = col_types,
+                      sep = ","
+)
+
+#check its structure again
+str(abalone, vec.len = 1)
+```
+#### Your Turn
+```{r}
+abalone <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data", 
+                    col.names = col_names, 
+                    colClasses = col_types)
+summary(abalone[-1], digits = 4)
+sd(abalone$length)
+sd(abalone$diameter)
+sd(abalone$height)
+sd(abalone$whole_weight)
+sd(abalone$shucked_weight)
+sd(abalone$viscera_weight)
+sd(abalone$shell_weight)
+sd(abalone$rings)
+```
+
+## Pittsburgh Bridges
+* Are there column names?  
+    + There are no column names in the file.  
+* What is the field separator?  
+    + The field seperator is ","  
+* Are there any missing values?  
+    + There are several missing values.  
+* What is the character for missing values (if any)?  
+    + "?" is used to represent missing value.  
+* What is the data type of each variable (i.e. column)?  
+    + The data types of the 13 variables are listed in the chunk below in the var_types vector.
+```{r}
+# download a copy of the data file
+origin <- "http://archive.ics.uci.edu/ml/machine-learning-databases/bridges/bridges.data.version1"
+destination <- "~/Desktop/Stat133/Lab4/bridges.data"
+download.file(origin, destination)
+
+# vector of column names
+var_names <- c('ID', 'river', 'location', 'erected_year', 'purpose', 'length', 'lanes', 'Clear-g', 't_or_d', 'material', 'span', 'relative_length', 'type')
+
+# vector of column types
+var_types <- c('character', 'factor', 'numeric', 'integer', 'factor', 'integer', 'integer', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor')
+
+# reading the data with read.table()
+bridges1 <- read.table( 
+  destination, 
+  col.names = var_names, 
+  colClasses = var_types, 
+  sep = ",", 
+  na.strings = "?", 
+  header = FALSE)
+
+# reading the data with 'read.csv()'
+bridges2 <- read.csv(destination, 
+                    col.names = var_names, 
+                    colClasses = var_types, 
+                    na.strings = "?", 
+                    header = FALSE)
+
+# setting colClasses to read first 5 columns
+bridges3 <- read.table( 
+  destination, 
+  col.names = var_names, 
+  colClasses = c(var_types[1:5], rep('NULL', times = 8)), 
+  sep = ",", 
+  na.strings = "?", 
+  header = FALSE)
+bridges3
+```
+#### Basic Inspection
+```{r}
+str(bridges1)
+summary(bridges1)
+head(bridges1)
+tail(bridges1)
+dim(bridges1)
+names(bridges1)
+colnames(bridges1)
+nrow(bridges1)
+ncol(bridges1)
+```
+#### Optional: Want to do more?
+```{r}
+old_year <- min(bridges1$erected_year)
+oldest <- bridges1$ID[bridges1$erected_year == old_year]
+paste(oldest, "is the oldest bridge, built in", old_year)
+
+new_year <- max(bridges1$erected_year)
+newest <- bridges1$ID[bridges1$erected_year == new_year]
+paste(newest, "is the newest bridge, built in", new_year)
+
+table(bridges1$purpose)
+table(bridges1$material)
+avrg_length <- round( mean(bridges1$length, na.rm = TRUE), digits = 0)
+paste("The average length of the bridges is", avrg_length, "feet.")
+plot(x = bridges1$erected_year, 
+     y = bridges1$length, 
+     main = "Bridges: Year Erected vs. Length",
+     xlab = "Year Erected", 
+     ylab = "Length",
+     col = bridges1$material)
+legend("topleft", 
+       legend = unique(bridges1$material), 
+       col = unique(bridges1$material), 
+       title = "Bridge Material",
+       pch = 1)
+cor_line <- lm(bridges1$length ~ bridges1$erected_year)
+abline(cor_line)
+cor_eq <- paste("y = ", round(coef(cor_line)[2], digits = 2), "x ", round(coef(cor_line)[1], digits = 0), sep = "")
+text(x = 1973, y = 1300, labels = cor_eq)
+```
+
+## Creating Data Frames
+```{r}
+player <- c('Thompson', 'Curry', 'Green', 'Durant', 'Pachulia')
+position <- c('SG', 'PG', 'PF', 'SF', 'C')
+salary <- c(16663575, 12112359, 15330435, 26540100, 289800)
+points <- c(1742, 1999, 776, 1555, 426)
+ppg <- c(22.3, 25.3, 10.2, 25.1, 6.1)
+rookie <- c(FALSE, FALSE, FALSE, FALSE, FALSE)
+nba <- data.frame(player, 
+                  position, 
+                  salary, 
+                  points, 
+                  ppg, 
+                  rookie)
+is.data.frame(nba)
+is.list(nba)
+nba2 <- data.frame(list(player, 
+                        position, 
+                        salary, 
+                        points, 
+                        ppg, 
+                        rookie))
+nba3 <- data.frame(player, 
+                   as.factor(position), 
+                   salary, 
+                   as.integer(points), 
+                   ppg, 
+                   rookie, 
+                   stringsAsFactors = FALSE)
+str(nba3)
+nba_bind <- cbind(player, 
+                  position, 
+                  salary, 
+                  points, 
+                  ppg, 
+                  rookie)
+class(nba_bind)
+nba_bind <- as.data.frame(nba_bind)
+class(nba_bind)
+```
+## NBA Players Data
+```{r}
+# download csv file into your working directory
+csv <- "https://github.com/ucb-stat133/stat133-fall-2017/raw/master/data/nba2017-players.csv"
+download.file(url = csv, 
+              destfile = 'nba2017-players.csv')
+dat <- read.csv('nba2017-players.csv', 
+                stringsAsFactors = FALSE)
+```
+#### Your Turn
+```{r}
+# dimensions (# of rows, # of columns)
+dim(dat)
+# display first few rows
+head(dat)
+#check the structure
+str(dat, vec.len = 1)
+#last 5 rows
+tail(dat)
+summary(dat)
+#players shorter than 70 inches
+dat[dat$height < 70,]
+#names and salaries of centers
+dat[dat$position == "C",c("player", "salary")]
+durant <- dat[dat$player == "Kevin Durant",]
+ucla <- dat[dat$college == "University of California, Los Angeles",]
+rookies <- dat[dat$experience == 0,]
+rookie_centers <- dat[dat$experience == 0 & dat$position == "C",]
+top_players <- dat[dat$games > 50 & dat$minutes > 100,]
+#Largest height
+max(dat$height)
+#Minimum height
+min(dat$height)
+#Average height
+mean(dat$height)
+#Tallest player
+dat$player[dat$height == max(dat$height)]
+#Shortest player
+dat$player[dat$height == min(dat$height)]
+#Unique NBA teams
+unique(dat$team)
+#Number of unique NBA teams
+length(unique(dat$team))
+#Oldest player
+dat$player[dat$age == max(dat$age)]
+#Median salary of all players
+median(dat$salary)
+#Median salary of players with 10 or more years experience
+median(dat$salary[dat$experience >= 10])
+#Median salalry of Shooting Guards nad Point Guards
+median(dat$salary[dat$position == "SG" | dat$position == "PG"])
+#Median salary of Power Forwards, 29 or more years old and 74 inches or less tall 
+median(dat$salary[dat$position == "PF" & dat$age >= 29 & dat$height <= 74])
+#Number of players who scored 4 points or fewer
+length(dat$player[dat$points <= 4])
+#Those bad players
+dat$player[dat$points <= 4]
+#Player with 0 points
+dat$player[dat$points == 0]
+#UC Berkeley alumni
+length(dat$player[dat$college == "University of California"])
+#Notre Dame alumni
+ND <- dat$player[dat$college == "University of Notre Dame"]
+ND
+#Number of ND alumni
+length(ND)
+#Heavy players
+heavy <- dat$player[dat$weight > 260]
+length(heavy)
+heavy
+#Number of players not from US colleges
+length(dat$player[dat$college == ""])
+#Player with highest points per minute
+dat$player[which.max(dat$points/dat$minutes)]
+#Player with highest 3-pointers per minute
+dat$player[which.max(dat$points3/dat$minutes)]
+#Player wiht highest 2-pointers per minute
+dat$player[which.max(dat$points2/dat$minutes)]
+#Player with highest free throws per minute
+dat$player[which.max(dat$points1/dat$minutes)]
+gsw <- dat[dat$team == "GSW", c("player", "height", "weight")]
+gsw[order(gsw$height),]
+gsw[order(gsw$weight, decreasing = TRUE),]
+#Top 5 Paid
+head(dat[order(dat$salary, decreasing = TRUE), c("player", "team", "salary")], n = 5)
+#Top 10 3-point shooters
+head(dat[order(dat$points3, decreasing = TRUE), c("player", "team", "points3")], n = 10)
+```
+#### Group By, Your Turn
+```{r}
+#Average height, weight and age by position
+aggregate(dat[, c("height", "weight", "age")], 
+          by = list(dat$position), 
+          FUN = mean)
+#Average height, weight, and age by team
+aggregate(dat[, c("height", "weight", "age")], 
+          by = list(dat$team), 
+          FUN = mean)
+#Average height, weight, and age by team and position
+aggregate(dat[, c("height", "weight", "age")], 
+          by = list(dat$team, dat$position), 
+          FUN = mean)
+#Median min, median, mean, and max salary by team and position
+aggregate(dat$salary, 
+          by = list(dat$team, dat$position), 
+          FUN = function(salary) {
+            c(min = min(salary), median = median(salary), mean = mean(salary), max = max(salary))
+            }
+          )
+```

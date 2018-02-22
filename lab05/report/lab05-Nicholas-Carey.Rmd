@@ -1,0 +1,155 @@
+---
+title: "lab05-Nicholas-Carey"
+author: "Nicholas Carey"
+date: "2/22/2018"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = '../images/')
+```
+
+## dplyr
+### Filtering, Slicing, and Selecting
+```{r Filter_Slice_Select}
+library(dplyr)
+library(ggplot2)
+dat <- read.csv("../data/nba2017-players.csv", stringsAsFactors = FALSE)
+slice(dat, 1:5)
+slice(dat, seq(from = 10, to = 50, by = 5))
+slice(dat, (nrow(dat)-5):nrow(dat))
+filter(dat, height < 70)
+filter(dat, team == "GSW")
+filter(dat, position == "C")
+select(filter(dat, team == "LAL"), player)
+select(filter(dat, team == "GSW", position == "PG"), player, salary)
+select(filter(dat, experience > 10, salary <= 10000000), player, age, team)
+slice(select(filter(dat, experience == 0, age == 20), player, team, height, weight), 1:5)
+```
+
+### Mutating and Arranging
+```{r Mutate_Arrange}
+gsw <- filter(dat, team == "GSW")
+gsw <- select(gsw, player, height, weight)
+gsw <- slice(gsw, c(4, 8, 10, 14, 15))
+gsw
+gsw2 <- mutate(gsw, ht_m = height * 0.0254, wt_kg = weight * 0.4536)
+gsw2
+mutate(gsw, product = height * weight)
+gsw3 <- mutate(gsw, log_height = log(height), log_weight = log(weight))
+gsw3
+arrange(filter(dat, height < 71), height)
+slice(arrange(select(dat, player, team, salary), salary), 1:5)
+slice(arrange(select(dat, player, team, points3), points3), 1:10)
+gsw_mpg <- filter(dat, team == "GSW")
+gsw_mpg <- mutate(gsw_mpg, min_per_game = minutes/games)
+gsw_mpg <- select(gsw_mpg, player, experience, min_per_game)
+gsw_mpg <- arrange(gsw_mpg, desc(min_per_game))
+gsw_mpg
+```
+
+### Summarizing and Grouping by
+```{r Summarise_GroupedBy}
+summarise(dat, max(height))
+summarise(dat, sd(points3))
+summarise(group_by(dat, team), median(points3))
+slice(arrange(summarise(group_by(dat, team), avg_points3 = mean(points3)), avg_points3), 1:5)
+summarise(filter(filter(dat, position == "PF", experience >= 5), experience <= 10), mean_age = mean(age), sd_age = sd(age))
+```
+
+## ggplot2
+
+```{r scatterplot1}
+ggplot(data = dat) +
+  geom_point(aes(x = points, y = salary))
+```
+
+```{r scatterplot2}
+ggplot(data = gsw) +
+  geom_point(aes(x = height, y = weight))
+```
+
+```{r scatterplot3}
+ggplot(data = gsw) +
+  geom_text(aes(x = height, y = weight, label = player))
+```
+
+```{r scatterplot4}
+warriors <- filter(dat, team == "GSW")
+ggplot(data = warriors) +
+  geom_label(aes(x = height, y = weight, label = player))
+```
+
+```{r densityplot1}
+ggplot(data = dat, aes(salary)) +
+  geom_density()
+```
+
+```{r histogram1}
+ggplot(data = dat, aes(points2)) +
+  geom_histogram(binwidth = 50)
+```
+
+```{r barchart1}
+ggplot(data = dat, aes(position)) +
+  geom_bar()
+```
+
+```{r scatterplot5}
+centers <- filter(dat, position == "C")
+ggplot(data = centers, aes(x = experience, y = salary)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+```{r scatterplot6}
+ggplot(data = centers, aes(x = experience, y = salary)) +
+  geom_point() +
+  geom_smooth(method = loess)
+```
+
+### Faceting
+
+```{r pos_facet_scatterplot}
+ggplot(data = dat, aes(x = experience, y = salary)) +
+  geom_point(aes(color = position), alpha = 0.7) +
+  facet_wrap(~ position)
+```
+
+```{r team_facet_scatterplot}
+ggplot(data = dat, aes(x = position, y = salary)) +
+  geom_point(alpha = 0.7) +
+  facet_wrap(~ team)
+```
+
+```{r team_facet_densityplot}
+ggplot(data = dat, aes(age)) +
+  geom_bar() +
+  facet_wrap(~ team)
+```
+
+```{r pos_facet_scatterplot2}
+ggplot(data = dat, aes(x = height, y = weight)) +
+  geom_point(aes(col = position), alpha = 0.7) +
+  facet_wrap(~ position)
+```
+
+```{r density2d}
+ggplot(data = dat, aes(x = experience, y = salary)) +
+  geom_density2d(aes(col = position)) +
+  facet_wrap(~ position)
+```
+
+```{r backgroundscatter}
+ggplot(data = warriors, aes(x = experience, y = salary)) +
+  geom_point(alpha = 0.7) +
+  theme_bw()
+```
+
+```{r repeat_scat5}
+centers <- filter(dat, position == "C")
+ggplot(data = centers, aes(x = experience, y = salary)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  theme_dark()
+```
