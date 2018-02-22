@@ -4,7 +4,7 @@ This lab is an introduction to the "dplyr" and "ggplot2" packages.
 
 Data used: [nba2017-players.csv](data/nba2017-players.csv) stored in "data/"  
 
-[Final report](reports/lab05-Nicholas-Carey.html) for this lab found in "report/"  
+[Final report](report/lab05-Nicholas-Carey.html) for this lab found in "report/"  
 
 All [images](images/) found in the report are stored in "images/"  
 
